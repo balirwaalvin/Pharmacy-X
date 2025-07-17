@@ -1,0 +1,35 @@
+name: pharmacy-x
+services:
+- name: web
+  source_dir: /
+  github:
+    repo: balirwaalvin/Pharmacy-X
+    branch: main
+  run_command: apache2-foreground
+  environment_slug: php
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  routes:
+  - path: /
+  health_check:
+    http_path: /
+  envs:
+  - key: DB_HOST
+    scope: RUN_TIME
+    type: SECRET
+  - key: DB_USER
+    scope: RUN_TIME
+    type: SECRET
+  - key: DB_PASS
+    scope: RUN_TIME
+    type: SECRET
+  - key: DB_NAME
+    scope: RUN_TIME
+    type: SECRET
+  - key: APP_ENV
+    scope: RUN_TIME
+    value: production
+databases:
+- name: pharmacy-db
+  engine: MYSQL
+  version: "8"

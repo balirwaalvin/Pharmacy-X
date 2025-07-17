@@ -1,6 +1,6 @@
 FROM php:8.1-apache
 
-# Install necessary PHP extensions
+# Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
     unzip \
     git \
@@ -11,16 +11,41 @@ RUN apt-get update && apt-get install -y \
     zip \
     curl \
     && docker-php-ext-install mysqli \
-    && docker-php-ext-enable mysqli
+    && docker-php-ext-enable mysqli \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Enable Apache mod_rewrite (if needed for pretty URLs)
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Enable Apache mod_rewrite
 RUN a2enmod rewrite
-
-# Copy all project files into the container
-COPY . /var/www/html/
-
-# Fix permissions so Apache can serve everything
-RUN chown -R www-data:www-data /var/www/html
 
 # Set working directory
 WORKDIR /var/www/html
+
+# Copy composer files first for better caching
+COPY composer.json composer.lock* ./
+
+# Install PHP dependencies
+RUN composer install --no-dev --optimize-autoloader --no-interaction
+
+# Copy all project files
+COPY . .
+
+# Create upload directories and set permissions
+RUN mkdir -p Images/PaymentSlips \
+    Images/PrescriptionMessage \
+    Images/PrescriptionOrders \
+    Images/Profile_Pics \
+    && chown -R www-data:www-data /var/www/html \
+    && chmod 755 Images/PaymentSlips \
+    Images/PrescriptionMessage \
+    Images/PrescriptionOrders \
+    Images/Profile_Pics
+
+# Expose port 80
+EXPOSE 80
+
+# Start Apache
+CMD ["apache2-foreground"]
