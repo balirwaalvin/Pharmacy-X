@@ -23,9 +23,9 @@
 ### Service Configuration
 - **Service Type**: Web Service
 - **Environment**: PHP
-- **Build Command**: (leave empty or use `composer install --no-dev`)
+- **Build Command**: `./build.sh` (or leave empty)
 - **Run Command**: `apache2-foreground`
-- **HTTP Port**: 8080
+- **HTTP Port**: 80 (not 8080 - this is important!)
 - **Instance Size**: Basic ($5/month)
 
 ### Environment Variables
@@ -87,6 +87,15 @@ After deployment:
 ### Build Failures
 - Ensure `composer.json` and `composer.lock` are in your repository
 - Check build logs in the DigitalOcean dashboard
+
+### Port Mismatch Issues
+- Ensure `http_port: 80` is set in your app.yaml
+- Verify Apache is running on port 80 (default)
+- Do NOT use port 8080 for PHP/Apache applications
+
+### Apache Configuration Warnings
+- The ServerName warning is handled automatically by our configuration
+- Check that `apache.conf` and `start.sh` are in your repository
 
 ### Database Connection Issues
 - Verify environment variables are set correctly

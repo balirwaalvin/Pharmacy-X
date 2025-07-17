@@ -9,6 +9,7 @@ services:
   environment_slug: php
   instance_count: 1
   instance_size_slug: basic-xxs
+  http_port: 80
   routes:
   - path: /
   health_check:

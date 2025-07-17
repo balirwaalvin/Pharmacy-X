@@ -6,7 +6,7 @@ echo "Starting build process for Pharmacy-X..."
 # Install PHP dependencies if composer.json exists
 if [ -f "composer.json" ]; then
     echo "Installing PHP dependencies..."
-    composer install --no-dev --optimize-autoloader
+    composer install --no-dev --optimize-autoloader --no-interaction
 else
     echo "No composer.json found, skipping dependency installation"
 fi
@@ -23,5 +23,8 @@ chmod 755 Images/PaymentSlips
 chmod 755 Images/PrescriptionMessage
 chmod 755 Images/PrescriptionOrders
 chmod 755 Images/Profile_Pics
+
+# Make startup script executable
+chmod +x start.sh
 
 echo "Build completed successfully!"
