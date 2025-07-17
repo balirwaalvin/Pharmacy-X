@@ -21,11 +21,6 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Enable Apache modules
 RUN a2enmod rewrite deflate headers
 
-# Configure Apache for port 8080 (DigitalOcean App Platform requirement)
-RUN sed -i 's/80/8080/g' /etc/apache2/sites-available/000-default.conf \
-    && sed -i 's/80/8080/g' /etc/apache2/ports.conf \
-    && echo "Listen 8080" >> /etc/apache2/ports.conf
-
 # Set ServerName to suppress Apache warning
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
@@ -38,26 +33,32 @@ COPY composer.json composer.lock* ./
 # Install PHP dependencies (if any)
 RUN if [ -f composer.json ]; then composer install --no-dev --optimize-autoloader --no-interaction; fi
 
-# Copy Apache configuration
-COPY apache.conf /etc/apache2/conf-available/pharmacy.conf
-RUN a2enconf pharmacy
-
 # Copy all project files
 COPY . .
 
-# Create upload directories and set permissions
+# Replace default Apache configuration with our custom configuration
+COPY ports.conf /etc/apache2/ports.conf
+COPY apache.conf /etc/apache2/conf-available/pharmacy.conf
+
+# Update default site to use port 8080
+RUN sed -i 's/:80/:8080/g' /etc/apache2/sites-available/000-default.conf
+
+# Enable our custom configuration
+RUN a2enconf pharmacy
+
+# Create upload directories and set proper permissions
 RUN mkdir -p Images/PaymentSlips \
     Images/PrescriptionMessage \
     Images/PrescriptionOrders \
     Images/Profile_Pics \
     && chown -R www-data:www-data /var/www/html \
-    && chmod 755 Images/PaymentSlips \
-    Images/PrescriptionMessage \
-    Images/PrescriptionOrders \
-    Images/Profile_Pics
+    && chmod -R 755 Images/
+
+# Make start script executable
+RUN chmod +x start.sh
 
 # Expose port 8080 (DigitalOcean App Platform standard)
 EXPOSE 8080
 
-# Start Apache in foreground
-CMD ["apache2-foreground"]
+# Use our startup script
+CMD ["./start.sh"]

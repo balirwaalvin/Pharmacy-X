@@ -5,7 +5,7 @@ services:
   github:
     repo: balirwaalvin/Pharmacy-X
     branch: main
-  run_command: apache2-foreground
+  run_command: "./start.sh"
   environment_slug: php
   instance_count: 1
   instance_size_slug: basic-xxs

@@ -19,12 +19,15 @@ mkdir -p Images/PrescriptionOrders
 mkdir -p Images/Profile_Pics
 
 # Make directories writable
-chmod 755 Images/PaymentSlips
-chmod 755 Images/PrescriptionMessage
-chmod 755 Images/PrescriptionOrders
-chmod 755 Images/Profile_Pics
+chmod -R 755 Images/
 
-# Make startup script executable
+# Make scripts executable
 chmod +x start.sh
+chmod +x build.sh
+
+# Set proper ownership (if running as root)
+if [ "$(id -u)" = "0" ]; then
+    chown -R www-data:www-data Images/
+fi
 
 echo "Build completed successfully!"
