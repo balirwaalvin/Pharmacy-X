@@ -1,19 +1,23 @@
-# Use the official PHP image with Apache (or CLI if you prefer)
-FROM php:8.2-apache
+# Use the official PHP image with Apache
+FROM php:8.1-apache
 
-# Copy your source code into the container
-COPY . /var/www/html/
-
-# If you use Composer, install it and your dependencies
-RUN apt-get update && apt-get install -y unzip git \
-    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-    && composer install --no-dev --optimize-autoloader
-
-# Enable Apache rewrite module (optional, useful for frameworks like Laravel)
+# Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
-# Expose port 80 for the web server
-EXPOSE 80
+# Copy all project files into the Apache web root
+COPY . /var/www/html/
 
-# Start Apache in the foreground
-CMD ["apache2-foreground"]
+# Set working directory
+WORKDIR /var/www/html
+
+# Install dependencies (optional: unzip and git)
+RUN apt-get update && apt-get install -y unzip git \
+    # Install Composer (optional, in case you need it later)
+    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    # && composer install --no-dev --optimize-autoloader  # ❌ Commented out: causes error if no composer.json
+
+# Set permissions (optional, for better compatibility)
+RUN chown -R www-data:www-data /var/www/html
+
+# Expose port 80 (default for Apache)
+EXPOSE 80
