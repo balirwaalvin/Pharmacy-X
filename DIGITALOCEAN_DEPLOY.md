@@ -25,8 +25,13 @@
 - **Environment**: PHP
 - **Build Command**: `./build.sh` (or leave empty)
 - **Run Command**: `apache2-foreground`
-- **HTTP Port**: 80 (not 8080 - this is important!)
+- **HTTP Port**: 8080 (DigitalOcean App Platform standard for PHP)
 - **Instance Size**: Basic ($5/month)
+
+### Important: Port Configuration
+- DigitalOcean App Platform expects PHP applications to run on port 8080
+- Do NOT specify `http_port` in app.yaml (let it use default 8080)
+- Our configuration automatically sets up Apache for port 8080
 
 ### Environment Variables
 Set these in the App Platform dashboard:
@@ -89,9 +94,10 @@ After deployment:
 - Check build logs in the DigitalOcean dashboard
 
 ### Port Mismatch Issues
-- Ensure `http_port: 80` is set in your app.yaml
-- Verify Apache is running on port 80 (default)
-- Do NOT use port 8080 for PHP/Apache applications
+- DigitalOcean App Platform expects PHP apps on port 8080 by default
+- Do NOT specify `http_port` in app.yaml - let it use the default
+- Our Dockerfile and Apache config are set for port 8080
+- If you see port mismatch errors, ensure no `http_port` is specified in app.yaml
 
 ### Apache Configuration Warnings
 - The ServerName warning is handled automatically by our configuration

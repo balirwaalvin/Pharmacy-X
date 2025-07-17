@@ -21,6 +21,14 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Enable Apache modules
 RUN a2enmod rewrite deflate headers
 
+# Configure Apache for port 8080 (DigitalOcean App Platform requirement)
+RUN sed -i 's/80/8080/g' /etc/apache2/sites-available/000-default.conf \
+    && sed -i 's/80/8080/g' /etc/apache2/ports.conf \
+    && echo "Listen 8080" >> /etc/apache2/ports.conf
+
+# Set ServerName to suppress Apache warning
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+
 # Set working directory
 WORKDIR /var/www/html
 
@@ -48,11 +56,8 @@ RUN mkdir -p Images/PaymentSlips \
     Images/PrescriptionOrders \
     Images/Profile_Pics
 
-# Set ServerName to suppress Apache warning
-RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
-
-# Expose port 80 (standard Apache port)
-EXPOSE 80
+# Expose port 8080 (DigitalOcean App Platform standard)
+EXPOSE 8080
 
 # Start Apache in foreground
 CMD ["apache2-foreground"]
