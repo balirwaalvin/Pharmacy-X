@@ -6,6 +6,9 @@
 # Database configuration (create a template instead)
 # db_Config/config.php
 
+# Database test file (remove after testing)
+# db_test.php
+
 # Uploaded files (these should be backed up separately)
 Images/PaymentSlips/*
 Images/PrescriptionMessage/*

@@ -46,33 +46,51 @@ APP_ENV=production
 
 ## Step 3: Add Database
 
+**IMPORTANT**: You must add a database and set environment variables for the app to work.
+
 1. **Create Managed Database**
-   - In your app settings, go to "Database"
-   - Click "Attach Database"
-   - Choose "Create and attach new database"
+   - In your DigitalOcean dashboard, go to "Databases"
+   - Click "Create Database Cluster"
    - **Engine**: MySQL 8
    - **Size**: Basic ($15/month for smallest)
    - **Name**: pharmacy-db
+   - **Wait for creation** (takes 5-10 minutes)
 
-2. **Database will auto-populate environment variables**
-   - DATABASE_URL will be automatically set
-   - Our config.php handles this automatically
+2. **Connect Database to App**
+   - Go to your app settings in DigitalOcean
+   - Click "Database"
+   - Click "Attach Database"
+   - Select your "pharmacy-db" database
+   - This will automatically set DATABASE_URL environment variable
+
+3. **Verify Environment Variables**
+   - In your app settings, go to "Settings" → "App-Level Environment Variables"
+   - You should see DATABASE_URL automatically added
+   - Format: `mysql://username:password@host:port/database`
 
 ## Step 4: Import Database
 
-After deployment:
+**CRITICAL**: Your app won't work until you import the database schema.
 
 1. **Get Database Connection Details**
    - Go to your database in DigitalOcean dashboard
-   - Note the connection details
+   - Click "Connection Details"
+   - Note: Host, Port, Username, Password, Database name
 
-2. **Connect and Import**
-   - Use MySQL Workbench, phpMyAdmin, or command line
-   - Import your `Database/PharmacyX_DB.sql` file
-
+2. **Connect and Import using MySQL Client**
    ```bash
    mysql -h your-host -P your-port -u your-user -p your-database < Database/PharmacyX_DB.sql
    ```
+
+3. **Or use phpMyAdmin/MySQL Workbench**
+   - Connect using the connection details
+   - Import your `Database/PharmacyX_DB.sql` file
+   - Verify tables are created
+
+4. **Alternative: Import via DigitalOcean Console**
+   - Go to your database cluster
+   - Click "Console" tab
+   - Upload and run your SQL file
 
 ## Step 5: Configure Domain (Optional)
 
@@ -104,9 +122,18 @@ After deployment:
 - Check that `apache.conf` and `start.sh` are in your repository
 
 ### Database Connection Issues
-- Verify environment variables are set correctly
-- Check database credentials in the DigitalOcean dashboard
-- Ensure database is running and accessible
+- **Error "No such file or directory"**: Database not attached to app
+  - Solution: Attach managed database in app settings
+  - Verify DATABASE_URL environment variable is set
+- **Error "Connection refused"**: Wrong host/port or database not running
+  - Check database cluster status in DigitalOcean dashboard
+  - Verify connection details match DATABASE_URL
+- **Error "Access denied"**: Wrong username/password
+  - Check DATABASE_URL format: `mysql://user:pass@host:port/db`
+  - Verify database user has proper permissions
+- **Error "Unknown database"**: Database schema not imported
+  - Import PharmacyX_DB.sql file to your database
+  - Check database name in connection string
 
 ### File Upload Issues
 - Upload directories are created automatically
